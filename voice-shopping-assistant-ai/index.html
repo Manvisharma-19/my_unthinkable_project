@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0f1e17" />
+    <meta name="description" content="An AI voice agent that manages your shopping list and talks back." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%92%3C/text%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <title>Voxa — AI Voice Shopping Agent</title>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand__mark">Vox<span>a</span></div>
+          <div class="brand__tag" id="mode-tag">rule-based</div>
+        </div>
+        <button class="gear" id="settings-btn" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="banner" id="banner" role="status" style="display: none">
+        <span>&#127897;&#65039;</span>
+        <span>Your browser doesn&rsquo;t support voice input. You can still type
+          commands below &mdash; they work exactly the same. For voice, try
+          Chrome, Edge, or Safari.</span>
+      </div>
+
+      <!-- Agent hero -->
+      <section class="agent">
+        <button class="orb" id="orb" aria-label="Start voice input">
+          <span class="orb__ring r1"></span>
+          <span class="orb__ring r2"></span>
+          <span class="orb__ring r3"></span>
+          <span class="orb__core" id="orb-icon"></span>
+        </button>
+        <div class="agent-status" id="agent-status">Tap to speak</div>
+        <div class="agent-transcript" id="agent-transcript"></div>
+      </section>
+
+      <!-- Conversation feed -->
+      <div class="feed" id="feed"></div>
+
+      <div class="stack">
+        <div id="search-panel"></div>
+
+        <div class="card list-card">
+          <div class="section-title" style="margin-bottom: 4px">
+            &#128203; Shopping list
+            <span class="count" id="list-count" style="display: none">0</span>
+            <button class="clear-list" id="clear-all" style="margin-left: auto; display: none">Clear all</button>
+          </div>
+          <div id="list-body"></div>
+        </div>
+
+        <div id="suggestions-panel"></div>
+      </div>
+    </div>
+
+    <!-- Bottom typed dock -->
+    <div class="dock">
+      <div class="typed">
+        <input id="typed-input" type="text" aria-label="Type a command"
+          placeholder='Type a command, e.g. "add 2 bananas"' />
+        <button id="send-btn">Send</button>
+      </div>
+    </div>
+
+    <!-- Settings drawer -->
+    <div class="scrim" id="scrim"></div>
+    <aside class="drawer" id="drawer" aria-label="Settings" aria-hidden="true">
+      <div class="drawer__head">
+        <h2>Settings</h2>
+        <button class="drawer__close" id="drawer-close" aria-label="Close settings">&times;</button>
+      </div>
+
+      <div class="setting">
+        <label class="setting__label" for="lang-select">Voice language</label>
+        <div class="lang"><select id="lang-select" aria-label="Voice language"></select></div>
+      </div>
+
+      <div class="setting setting--switch">
+        <div>
+          <div class="setting__label">Spoken replies</div>
+          <div class="setting__hint">Voxa reads confirmations aloud.</div>
+        </div>
+        <button class="switch" id="tts-toggle" role="switch" aria-checked="true"><span></span></button>
+      </div>
+
+      <div class="setting setting--switch">
+        <div>
+          <div class="setting__label">Hands-free mode</div>
+          <div class="setting__hint">Keep listening for back-to-back commands.</div>
+        </div>
+        <button class="switch" id="cont-toggle" role="switch" aria-checked="false"><span></span></button>
+      </div>
+
+      <div class="drawer__divider"></div>
+
+      <div class="setting setting--switch">
+        <div>
+          <div class="setting__label">AI understanding <span class="badge">beta</span></div>
+          <div class="setting__hint">Understands free-form &amp; recipe requests.</div>
+        </div>
+        <button class="switch" id="ai-toggle" role="switch" aria-checked="false"><span></span></button>
+      </div>
+
+      <div class="setting setting--ai" id="ai-key-row" style="display: none">
+        <label class="setting__label" for="api-key">Google Gemini API key</label>
+        <input class="text-input" id="api-key" type="password" placeholder="Paste your free key" autocomplete="off" />
+        <div class="setting__hint">
+          Free key from Google AI Studio. Stored only in this browser. Without a
+          key, Voxa uses its built-in parser.
+        </div>
+      </div>
+
+      <div class="drawer__foot">Data stays on your device. No account needed.</div>
+    </aside>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
